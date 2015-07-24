@@ -14,10 +14,24 @@ images="docker.io/openshift/sti-image-builder \
     docker.io/openshift/origin-base \
     docker.io/centos:centos7"
 
+echo "Starting openshiftdev..."
 virsh start openshiftdev
-sleep 5
+sleep 10
 
-guest_ip=$(arp -an | grep 52:54:00:be:6e:81 | cut -f 2 -d "(" | cut -f 1 -d ")")
+while [ -z "$guest_ip" ]; do
+    guest_ip=$(arp -an | grep 52:54:00:be:6e:81 | cut -f 2 -d "(" | cut -f 1 -d ")")
+    sleep 1
+done
+
+echo "Checking if $guest_ip is up..."
+
+while true; do
+    ssh -t -q vagrant@$guest_ip "echo 2>&1"
+    if [ $? -eq 0 ]; then
+        break
+    fi
+    sleep 1
+done
 
 script_path=$(mktemp)
 cat <<EOF > $script_path
@@ -25,8 +39,8 @@ echo "Mounting origin..."
 sudo mount -t 9p -o trans=virtio,version=9p2000.L /mnt/origin /data/src/github.com/openshift/origin/
 
 echo "Pruning docker..."
-docker rmi $(docker images -q -f "dangling=true")
-docker rm -f $(docker ps -qa)
+docker rmi \$(docker images -q -f "dangling=true")
+docker rm -f \$(docker ps -qa)
 
 echo "Pulling images..."
 for img in $(echo $images); do
