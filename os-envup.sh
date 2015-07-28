@@ -38,9 +38,7 @@ cat <<EOF > $script_path
 echo "Mounting origin..."
 sudo mount -t 9p -o trans=virtio,version=9p2000.L /mnt/origin /data/src/github.com/openshift/origin/
 
-echo "Pruning docker..."
-docker rmi \$(docker images -q -f "dangling=true")
-docker rm -f \$(docker ps -qa)
+os-cleanup.sh
 
 echo "Pulling images..."
 for img in $(echo $images); do
