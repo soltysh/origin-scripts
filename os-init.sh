@@ -12,6 +12,9 @@ echo "Creating registry ..."
 sudo chmod +r $HOME/openshift.local.config/master/openshift-registry.kubeconfig
 oadm registry --latest-images --credentials=$HOME/openshift.local.config/master/openshift-registry.kubeconfig --config=$HOME/openshift.local.config/master/admin.kubeconfig
 
+echo "Importing ImageStreams..."
+oc create -f /data/src/github.com/openshift/origin/examples/image-streams/image-streams-centos7.json -n openshift --config=$HOME/openshift.local.config/master/admin.kubeconfig
+
 echo "Setting up policy ..."
 oadm policy add-role-to-user view test-admin --config=$HOME/openshift.local.config/master/admin.kubeconfig
 
