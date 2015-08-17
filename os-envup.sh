@@ -38,12 +38,12 @@ cat <<EOF > $script_path
 echo "Mounting origin..."
 sudo mount -t 9p -o trans=virtio,version=9p2000.L /mnt/origin /data/src/github.com/openshift/origin/
 
-os-cleanup.sh
-
 echo "Pulling images..."
 for img in $(echo $images); do
     docker pull \$img
 done
+
+os-cleanup.sh
 EOF
 
 scp $GOPATH/src/github.com/soltysh/origin-scripts/* vagrant@$guest_ip:bin/
