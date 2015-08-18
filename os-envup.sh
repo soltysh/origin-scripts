@@ -38,6 +38,9 @@ cat <<EOF > $script_path
 echo "Mounting origin..."
 sudo mount -t 9p -o trans=virtio,version=9p2000.L /mnt/origin /data/src/github.com/openshift/origin/
 
+echo "Mounting k8s..."
+sudo mount -t 9p -o trans=virtio,version=9p2000.L /mnt/k8s /data/src/k8s.io/kubernetes/
+
 echo "Pulling images..."
 for img in $(echo $images); do
     docker pull \$img
