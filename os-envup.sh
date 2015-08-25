@@ -34,6 +34,9 @@ while true; do
 done
 
 script_path=$(mktemp)
+
+# sometimes I don't want to have the images to be pulled
+if [ "$1" == "--fast" ]; then
 cat <<EOF > $script_path
 echo "Mounting origin..."
 sudo mount -t 9p -o trans=virtio,version=9p2000.L /mnt/origin /data/src/github.com/openshift/origin/
@@ -41,6 +44,17 @@ sudo mount -t 9p -o trans=virtio,version=9p2000.L /mnt/origin /data/src/github.c
 echo "Mounting k8s..."
 sudo mount -t 9p -o trans=virtio,version=9p2000.L /mnt/k8s /data/src/k8s.io/kubernetes/
 
+os-cleanup.sh
+EOF
+else
+cat <<EOF > $script_path
+echo "Mounting origin..."
+sudo mount -t 9p -o trans=virtio,version=9p2000.L /mnt/origin /data/src/github.com/openshift/origin/
+
+echo "Mounting k8s..."
+sudo mount -t 9p -o trans=virtio,version=9p2000.L /mnt/k8s /data/src/k8s.io/kubernetes/
+
+cat <<EOF > $script_path
 echo "Pulling images..."
 for img in $(echo $images); do
     docker pull \$img
@@ -48,6 +62,7 @@ done
 
 os-cleanup.sh
 EOF
+fi
 
 scp $GOPATH/src/github.com/soltysh/origin-scripts/* vagrant@$guest_ip:bin/
 cat $script_path | ssh -t vagrant@$guest_ip
