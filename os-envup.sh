@@ -1,7 +1,6 @@
 #!/bin/bash
 
-images="docker.io/openshift/sti-image-builder \
-    docker.io/openshift/origin-sti-builder \
+images="docker.io/openshift/origin-sti-builder \
     docker.io/openshift/origin-custom-docker-builder \
     docker.io/openshift/origin-docker-builder \
     docker.io/openshift/origin-deployer \
@@ -54,7 +53,6 @@ sudo mount -t 9p -o trans=virtio,version=9p2000.L /mnt/origin /data/src/github.c
 echo "Mounting k8s..."
 sudo mount -t 9p -o trans=virtio,version=9p2000.L /mnt/k8s /data/src/k8s.io/kubernetes/
 
-cat <<EOF > $script_path
 echo "Pulling images..."
 for img in $(echo $images); do
     docker pull \$img
