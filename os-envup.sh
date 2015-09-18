@@ -13,12 +13,17 @@ images="docker.io/openshift/origin-sti-builder \
     docker.io/openshift/origin-base \
     docker.io/centos:centos7"
 
+echo "Starting NFS..."
+sudo systemctl start nfs-server.service
+sudo firewall-cmd --add-service nfs
+# rpcbind ?
+
 echo "Starting openshiftdev..."
-virsh start openshiftdev
-sleep 10
+# virsh start openshiftdev
+# sleep 10
 
 while [ -z "$guest_ip" ]; do
-    guest_ip=$(arp -an | grep 52:54:00:be:6e:81 | cut -f 2 -d "(" | cut -f 1 -d ")")
+    guest_ip=$(arp -an | grep 52:54:00:f2:5e:34 | cut -f 2 -d "(" | cut -f 1 -d ")")
     sleep 1
 done
 
@@ -38,20 +43,20 @@ script_path=$(mktemp)
 if [ "$1" == "--fast" ]; then
 cat <<EOF > $script_path
 echo "Mounting origin..."
-sudo mount -t 9p -o trans=virtio,version=9p2000.L /mnt/origin /data/src/github.com/openshift/origin/
+sudo mount 192.168.121.1:/nfsshare/origin /data/src/github.com/openshift/origin/
 
 echo "Mounting k8s..."
-sudo mount -t 9p -o trans=virtio,version=9p2000.L /mnt/k8s /data/src/k8s.io/kubernetes/
+sudo mount 192.168.121.1:/nfsshare/kubernetes /data/src/k8s.io/kubernetes/
 
 os-cleanup.sh
 EOF
 else
 cat <<EOF > $script_path
 echo "Mounting origin..."
-sudo mount -t 9p -o trans=virtio,version=9p2000.L /mnt/origin /data/src/github.com/openshift/origin/
+sudo mount 192.168.121.1:/nfsshare/origin /data/src/github.com/openshift/origin/
 
 echo "Mounting k8s..."
-sudo mount -t 9p -o trans=virtio,version=9p2000.L /mnt/k8s /data/src/k8s.io/kubernetes/
+sudo mount 192.168.121.1:/nfsshare/kubernetes /data/src/k8s.io/kubernetes/
 
 echo "Pulling images..."
 for img in $(echo $images); do
