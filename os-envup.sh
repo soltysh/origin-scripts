@@ -16,11 +16,10 @@ images="docker.io/openshift/origin-sti-builder \
 echo "Starting NFS..."
 sudo systemctl start nfs-server.service
 sudo firewall-cmd --add-service nfs
-# rpcbind ?
 
 echo "Starting openshiftdev..."
-# virsh start openshiftdev
-# sleep 10
+virsh start openshiftdev
+sleep 10
 
 while [ -z "$guest_ip" ]; do
     guest_ip=$(arp -an | grep 52:54:00:f2:5e:34 | cut -f 2 -d "(" | cut -f 1 -d ")")
