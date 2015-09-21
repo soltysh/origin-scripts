@@ -48,6 +48,7 @@ echo "Mounting k8s..."
 sudo mount 192.168.121.1:/nfsshare/kubernetes /data/src/k8s.io/kubernetes/
 
 os-cleanup.sh
+sudo yum upgrade -y
 EOF
 else
 cat <<EOF > $script_path
@@ -63,6 +64,7 @@ for img in $(echo $images); do
 done
 
 os-cleanup.sh
+sudo yum upgrade -y
 EOF
 fi
 
