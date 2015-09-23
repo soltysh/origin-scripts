@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Starting OpenShift..."
-sudo /data/src/github.com/openshift/origin/_output/local/go/bin/openshift start &> logs/openshift.log &
+sudo /data/src/github.com/openshift/origin/_output/local/go/bin/openshift start &> $HOME/logs/openshift.log &
 sleep 10
 
 echo "Exporting vars ..."
