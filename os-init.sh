@@ -2,13 +2,13 @@
 
 echo "Starting OpenShift..."
 # write config
-sudo /data/src/github.com/openshift/origin/_output/local/go/bin/openshift start \
+sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/openshift start \
     --write-config=$HOME/openshift.local.config \
     --etcd-dir=$HOME/openshift.local.etcd \
     --volume-dir=$HOME/openshift.local.volumes \
     --images="openshift/origin-\${component}:latest" &> /dev/null
 # start openshift
-sudo /data/src/github.com/openshift/origin/_output/local/go/bin/openshift start \
+sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/openshift start \
   --master-config=$HOME/openshift.local.config/master/master-config.yaml \
   --node-config=$HOME/openshift.local.config/node-openshiftdev.local/node-config.yaml &> $HOME/logs/openshift.log &
 sleep 10
