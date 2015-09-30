@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 echo "Starting OpenShift..."
 # write config
@@ -23,6 +23,19 @@ oadm registry \
     --latest-images \
     --credentials=$HOME/openshift.local.config/master/openshift-registry.kubeconfig \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
+
+echo "Creating router ..."
+sudo chmod +r $HOME/openshift.local.config/master/openshift-router.kubeconfig
+echo '{"kind":"ServiceAccount","apiVersion":"v1","metadata":{"name":"router"}}' | oc create \
+    -f - \
+    --config=$HOME/openshift.local.config/master/admin.kubeconfig
+oc get scc privileged -o json --config=$HOME/openshift.local.config/master/admin.kubeconfig \
+    | sed '/\"users\"/a \"system:serviceaccount:default:router\",' \
+    | oc replace scc privileged -f - --config=$HOME/openshift.local.config/master/admin.kubeconfig
+oadm router --create --latest-images \
+    --credentials=$HOME/openshift.local.config/master/openshift-router.kubeconfig \
+    --config=$HOME/openshift.local.config/master/admin.kubeconfig \
+    --service-account=router
 
 echo "Importing ImageStreams..."
 oc create \
