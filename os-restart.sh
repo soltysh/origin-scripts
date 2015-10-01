@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 echo "Killing OpenShift..."
 sudo pkill openshift
