@@ -8,9 +8,11 @@ sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/openshi
     --volume-dir=$HOME/openshift.local.volumes \
     --images="openshift/origin-\${component}:latest" &> /dev/null
 # start openshift
+loglevel=${1:-0}
 sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/openshift start \
   --master-config=$HOME/openshift.local.config/master/master-config.yaml \
-  --node-config=$HOME/openshift.local.config/node-openshiftdev.local/node-config.yaml &> $HOME/logs/openshift.log &
+  --node-config=$HOME/openshift.local.config/node-"$(hostname)"/node-config.yaml \
+  --loglevel=$loglevel &> $HOME/logs/openshift.log &
 sleep 10
 
 echo "Exporting vars ..."
@@ -38,8 +40,15 @@ oadm router --create --latest-images \
     --service-account=router
 
 echo "Importing ImageStreams..."
+set +e
+release="centos7"
+cat /etc/redhat-release | grep -q "Red Hat Enterprise Linux"
+if [ $? -eq 0 ]; then
+    release="rhel7"
+fi
+set -e
 oc create \
-    -f /data/src/github.com/openshift/origin/examples/image-streams/image-streams-centos7.json \
+    -f /data/src/github.com/openshift/origin/examples/image-streams/image-streams-"${release}".json \
     -n openshift  \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
 
