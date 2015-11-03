@@ -14,3 +14,4 @@ mount | grep openshift.local.volumes | cut -f 3 -d " " | xargs sudo umount
 echo "Pruning dirs..."
 sudo rm -rf $HOME/openshift.local.*
 sudo rm -rf $HOME/logs/*
+sudo rm -rf $HOME/.kube
