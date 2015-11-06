@@ -39,6 +39,11 @@ oadm router --create --latest-images \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig \
     --service-account=router
 
+echo "Allowing access to etcd ..."
+sudo chmod +r $HOME/openshift.local.config/master/master.etcd-client.key
+sudo chmod +r $HOME/openshift.local.config/master/master.etcd-client.crt
+sudo chmod +r $HOME/openshift.local.config/master/ca.crt
+
 echo "Importing ImageStreams..."
 set +e
 release="centos7"
