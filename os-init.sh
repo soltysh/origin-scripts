@@ -15,18 +15,18 @@ sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/openshi
   --loglevel=$loglevel &> $HOME/logs/openshift.log &
 sleep 10
 
-echo "Exporting vars ..."
+echo "Exporting vars..."
 export CURL_CA_BUNDLE=$HOME/openshift.local.config/master/ca.crt
 sudo chmod a+rwX $HOME/openshift.local.config/master/admin.kubeconfig
 
-echo "Creating registry ..."
+echo "Creating registry..."
 sudo chmod +r $HOME/openshift.local.config/master/openshift-registry.kubeconfig
 oadm registry \
     --latest-images \
     --credentials=$HOME/openshift.local.config/master/openshift-registry.kubeconfig \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
 
-echo "Creating router ..."
+echo "Creating router..."
 sudo chmod +r $HOME/openshift.local.config/master/openshift-router.kubeconfig
 echo '{"kind":"ServiceAccount","apiVersion":"v1","metadata":{"name":"router"}}' | oc create \
     -f - \
@@ -39,7 +39,7 @@ oadm router --create --latest-images \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig \
     --service-account=router
 
-echo "Allowing access to etcd ..."
+echo "Allowing access to etcd..."
 sudo chmod +r $HOME/openshift.local.config/master/master.etcd-client.key
 sudo chmod +r $HOME/openshift.local.config/master/master.etcd-client.crt
 sudo chmod +r $HOME/openshift.local.config/master/ca.crt
@@ -57,16 +57,16 @@ oc create \
     -n openshift  \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
 
-echo "Setting up policy ..."
+echo "Setting up policy..."
 oadm policy add-role-to-user view test-admin \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
 
-echo "Logging in ..."
+echo "Logging in..."
 oc login localhost:8443 \
     -u test-admin -p pass \
     --certificate-authority=$HOME/openshift.local.config/master/ca.crt
 
-echo "Creating new project ..."
+echo "Creating new project..."
 oc new-project test \
     --display-name="OpenShift 3 Sample" \
     --description="This is an example project to demonstrate OpenShift v3"

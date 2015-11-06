@@ -47,7 +47,14 @@ sudo mount 192.168.121.1:/nfsshare/origin /data/src/github.com/openshift/origin/
 echo "Mounting k8s..."
 sudo mount 192.168.121.1:/nfsshare/kubernetes /data/src/k8s.io/kubernetes/
 
+echo "Cleaning environment..."
 os-cleanup.sh
+
+echo "Installing completions..."
+sudo cp /data/src/github.com/openshift/origin/contrib/completions/bash/o* /etc/bash_completion.d/
+sudo cp /data/src/k8s.io/kubernetes/contrib/completions/bash/k* /etc/bash_completion.d/
+
+echo "Upgrading system..."
 sudo yum upgrade -y
 EOF
 else
@@ -63,7 +70,14 @@ for img in $(echo $images); do
     docker pull \$img
 done
 
+echo "Cleaning environment..."
 os-cleanup.sh
+
+echo "Installing completions..."
+sudo cp /data/src/github.com/openshift/origin/contrib/completions/bash/o* /etc/bash_completion.d/
+sudo cp /data/src/k8s.io/kubernetes/contrib/completions/bash/k* /etc/bash_completion.d/
+
+echo "Upgrading system..."
 sudo yum upgrade -y
 EOF
 fi
