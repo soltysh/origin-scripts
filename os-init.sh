@@ -61,10 +61,18 @@ echo "Setting up policy..."
 oadm policy add-role-to-user view test-admin \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
 
-echo "Logging in..."
+echo "Logging in to OpenShift..."
 oc login localhost:8443 \
     -u test-admin -p pass \
     --certificate-authority=$HOME/openshift.local.config/master/ca.crt
+
+echo "Logging in to docker registry..."
+token=$(oc whoami -t)
+registry=$(sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/oc \
+    --config=$HOME/openshift.local.config/master/admin.kubeconfig \
+    --template='{{.spec.portalIP}}:{{(index .spec.ports 0).port}}' \
+    get svc/docker-registry)
+docker login -u test-admin -e test@example.org -p ${token} ${registry}
 
 echo "Creating new project..."
 oc new-project test \
