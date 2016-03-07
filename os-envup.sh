@@ -55,7 +55,7 @@ sudo cp /data/src/github.com/openshift/origin/contrib/completions/bash/o* /etc/b
 sudo cp /data/src/k8s.io/kubernetes/contrib/completions/bash/k* /etc/bash_completion.d/
 
 echo "Upgrading system..."
-sudo yum upgrade -y
+sudo dnf upgrade -y
 EOF
 else
 cat <<EOF > $script_path
@@ -78,7 +78,7 @@ sudo cp /data/src/github.com/openshift/origin/contrib/completions/bash/o* /etc/b
 sudo cp /data/src/k8s.io/kubernetes/contrib/completions/bash/k* /etc/bash_completion.d/
 
 echo "Upgrading system..."
-sudo yum upgrade -y
+sudo dnf upgrade -y
 EOF
 fi
 
