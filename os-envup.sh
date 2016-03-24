@@ -82,7 +82,7 @@ sudo dnf upgrade -y
 EOF
 fi
 
-scp $GOPATH/src/github.com/soltysh/origin-scripts/* vagrant@$guest_ip:bin/
+scp $GOPATH/src/github.com/soltysh/origin-scripts/*.sh vagrant@$guest_ip:bin/
 cat $script_path | ssh -t vagrant@$guest_ip
 rm -f ${script_path}
 
