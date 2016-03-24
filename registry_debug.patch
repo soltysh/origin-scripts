@@ -1,0 +1,49 @@
+From edde402289465f2161ef40859c8e2c2a85a57064 Mon Sep 17 00:00:00 2001
+From: Maciej Szulik <maszulik@redhat.com>
+Date: Thu, 24 Mar 2016 09:13:26 +0100
+Subject: [PATCH] Registry host mount binary
+
+---
+ pkg/cmd/admin/registry/registry.go                          | 13 +++++++++++++
+ .../server/bootstrappolicy/securitycontextconstraints.go    |  1 +
+ 2 files changed, 14 insertions(+)
+
+diff --git a/pkg/cmd/admin/registry/registry.go b/pkg/cmd/admin/registry/registry.go
+index 667955f..01433d3 100644
+--- a/pkg/cmd/admin/registry/registry.go
++++ b/pkg/cmd/admin/registry/registry.go
+@@ -308,6 +308,19 @@ func RunCmdRegistry(f *clientcmd.Factory, cmd *cobra.Command, out io.Writer, cfg
+ 	}
+ 	env.Add(extraEnv)
+
++	mounts = append(mounts, kapi.VolumeMount{
++		Name:      "registry-bin",
++		MountPath: "/dockerregistry",
++	})
++	volumes = append(volumes, kapi.Volume{
++		Name: "registry-bin",
++		VolumeSource: kapi.VolumeSource{
++			HostPath: &kapi.HostPathVolumeSource{
++				Path: "/data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/dockerregistry",
++			},
++		},
++	})
++
+ 	livenessProbe := generateLivenessProbeConfig(healthzPort, tls)
+ 	readinessProbe := generateReadinessProbeConfig(healthzPort, tls)
+
+diff --git a/pkg/cmd/server/bootstrappolicy/securitycontextconstraints.go b/pkg/cmd/server/bootstrappolicy/securitycontextconstraints.go
+index f6c7e74..ca5d350 100644
+--- a/pkg/cmd/server/bootstrappolicy/securitycontextconstraints.go
++++ b/pkg/cmd/server/bootstrappolicy/securitycontextconstraints.go
+@@ -179,6 +179,7 @@ func GetBootstrapSecurityContextConstraints(sccNameToAdditionalGroups map[string
+ 					DescriptionAnnotation: SecurityContextConstraintRestrictedDesc,
+ 				},
+ 			},
++			AllowHostDirVolumePlugin: true,
+ 			SELinuxContext: kapi.SELinuxContextStrategyOptions{
+ 				// This strategy requires that annotations on the namespace which will be populated
+ 				// by the admission controller.  If namespaces are not annotated creating the strategy
+--
+2.5.5
+
