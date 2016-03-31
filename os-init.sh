@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-echo "Starting OpenShift..."
+echo "[INFO] Starting OpenShift..."
 # write config
 sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/openshift start \
     --write-config=$HOME/openshift.local.config \
@@ -13,38 +13,41 @@ sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/openshi
   --master-config=$HOME/openshift.local.config/master/master-config.yaml \
   --node-config=$HOME/openshift.local.config/node-"$(hostname)"/node-config.yaml \
   --loglevel=$loglevel &> $HOME/logs/openshift.log &
-sleep 10
+set +e
+while true; do
+    curl --max-time 2 -kfs https://localhost:8443/healthz &>/dev/null
+    if [ $? -eq 0 ]; then
+        break
+    fi
+    sleep 1
+done
+set -e
 
-echo "Exporting vars..."
+echo "[INFO] Exporting vars..."
 export CURL_CA_BUNDLE=$HOME/openshift.local.config/master/ca.crt
 sudo chmod a+rwX $HOME/openshift.local.config/master/admin.kubeconfig
 
-echo "Creating registry..."
-sudo chmod +r $HOME/openshift.local.config/master/openshift-registry.kubeconfig
+echo "[INFO] Creating registry..."
 oadm registry \
     --latest-images \
-    --credentials=$HOME/openshift.local.config/master/openshift-registry.kubeconfig \
+    --namespace=default \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
 
-echo "Creating router..."
-sudo chmod +r $HOME/openshift.local.config/master/openshift-router.kubeconfig
-echo '{"kind":"ServiceAccount","apiVersion":"v1","metadata":{"name":"router"}}' | oc create \
-    -f - \
+echo "[INFO] Creating router..."
+oadm policy add-scc-to-user hostnetwork \
+    --serviceaccount=router \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
-oc get scc privileged -o json --config=$HOME/openshift.local.config/master/admin.kubeconfig \
-    | sed '/\"users\"/a \"system:serviceaccount:default:router\",' \
-    | oc replace scc privileged -f - --config=$HOME/openshift.local.config/master/admin.kubeconfig
-oadm router --create --latest-images \
-    --credentials=$HOME/openshift.local.config/master/openshift-router.kubeconfig \
+oadm router \
+    --latest-images \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig \
     --service-account=router
 
-echo "Allowing access to etcd..."
+echo "[INFO] Allowing access to etcd..."
 sudo chmod +r $HOME/openshift.local.config/master/master.etcd-client.key
 sudo chmod +r $HOME/openshift.local.config/master/master.etcd-client.crt
 sudo chmod +r $HOME/openshift.local.config/master/ca.crt
 
-echo "Importing ImageStreams..."
+echo "[INFO] Importing ImageStreams..."
 set +e
 release="centos7"
 cat /etc/redhat-release | grep -q "Red Hat Enterprise Linux"
@@ -57,16 +60,16 @@ oc create \
     -n openshift  \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
 
-echo "Setting up policy..."
+echo "[INFO] Setting up policy..."
 oadm policy add-role-to-user view test-admin \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
 
-echo "Logging in to OpenShift..."
+echo "[INFO] Logging in to OpenShift..."
 oc login localhost:8443 \
     -u test-admin -p pass \
     --certificate-authority=$HOME/openshift.local.config/master/ca.crt
 
-echo "Creating new project..."
+echo "[INFO] Creating new project..."
 oc new-project test \
     --display-name="OpenShift 3 Sample" \
     --description="This is an example project to demonstrate OpenShift v3"

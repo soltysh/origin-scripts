@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-echo "Logging in to docker registry..."
+echo "[INFO] Logging in to docker registry..."
 registry=$(sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/oc \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig \
     --template='{{.spec.portalIP}}:{{(index .spec.ports 0).port}}' \

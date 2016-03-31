@@ -13,11 +13,11 @@ images="docker.io/openshift/origin-sti-builder \
     docker.io/openshift/origin-base \
     docker.io/centos:centos7"
 
-echo "Starting NFS..."
+echo "[INFO] Starting NFS..."
 sudo systemctl start nfs-server.service
 sudo firewall-cmd --add-service nfs
 
-echo "Starting openshiftdev..."
+echo "[INFO] Starting openshiftdev..."
 virsh start openshiftdev
 sleep 10
 
@@ -26,7 +26,7 @@ while [ -z "$guest_ip" ]; do
     sleep 1
 done
 
-echo "Checking if $guest_ip is up..."
+echo "[INFO] Checking if $guest_ip is up..."
 
 while true; do
     ssh -t -q vagrant@$guest_ip "echo 2>&1"
@@ -41,43 +41,43 @@ script_path=$(mktemp)
 # sometimes I don't want to have the images to be pulled
 if [ "$1" == "--fast" ]; then
 cat <<EOF > $script_path
-echo "Mounting origin..."
+echo "[INFO] Mounting origin..."
 sudo mount 192.168.121.1:/nfsshare/origin /data/src/github.com/openshift/origin/
 
-echo "Mounting k8s..."
+echo "[INFO] Mounting k8s..."
 sudo mount 192.168.121.1:/nfsshare/kubernetes /data/src/k8s.io/kubernetes/
 
-echo "Cleaning environment..."
+echo "[INFO] Cleaning environment..."
 os-cleanup.sh
 
-echo "Installing completions..."
+echo "[INFO] Installing completions..."
 sudo cp /data/src/github.com/openshift/origin/contrib/completions/bash/o* /etc/bash_completion.d/
 sudo cp /data/src/k8s.io/kubernetes/contrib/completions/bash/k* /etc/bash_completion.d/
 
-echo "Upgrading system..."
+echo "[INFO] Upgrading system..."
 sudo dnf upgrade -y
 EOF
 else
 cat <<EOF > $script_path
-echo "Mounting origin..."
+echo "[INFO] Mounting origin..."
 sudo mount 192.168.121.1:/nfsshare/origin /data/src/github.com/openshift/origin/
 
-echo "Mounting k8s..."
+echo "[INFO] Mounting k8s..."
 sudo mount 192.168.121.1:/nfsshare/kubernetes /data/src/k8s.io/kubernetes/
 
-echo "Pulling images..."
+echo "[INFO] Pulling images..."
 for img in $(echo $images); do
     docker pull \$img
 done
 
-echo "Cleaning environment..."
+echo "[INFO] Cleaning environment..."
 os-cleanup.sh
 
-echo "Installing completions..."
+echo "[INFO] Installing completions..."
 sudo cp /data/src/github.com/openshift/origin/contrib/completions/bash/o* /etc/bash_completion.d/
 sudo cp /data/src/k8s.io/kubernetes/contrib/completions/bash/k* /etc/bash_completion.d/
 
-echo "Upgrading system..."
+echo "[INFO] Upgrading system..."
 sudo dnf upgrade -y
 EOF
 fi
