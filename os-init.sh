@@ -49,6 +49,14 @@ sudo chmod +r $HOME/openshift.local.config/master/ca.crt
 
 echo "[INFO] Importing ImageStreams..."
 set +e
+while true; do
+    oc get namespace/openshift \
+    --config=$HOME/openshift.local.config/master/admin.kubeconfig &>/dev/null
+    if [ $? -eq 0 ]; then
+        break
+    fi
+    sleep 1
+done
 release="centos7"
 cat /etc/redhat-release | grep -q "Red Hat Enterprise Linux"
 if [ $? -eq 0 ]; then
