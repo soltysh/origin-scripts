@@ -8,7 +8,6 @@ vagrant up --provider aws
 vagrant sync-origin -s
 
 guest_ip=$(vagrant ssh-config | grep HostName | awk '{ print $2 }')
-guest_ip="ec2-${guest_ip//./-}.compute-1.amazonaws.com"
 
 scp $GOPATH/src/github.com/soltysh/origin-scripts/* $guest_ip:
 exec ssh $guest_ip
