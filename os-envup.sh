@@ -75,7 +75,6 @@ os-cleanup.sh
 
 echo "[INFO] Installing completions..."
 sudo cp /data/src/github.com/openshift/origin/contrib/completions/bash/o* /etc/bash_completion.d/
-sudo cp /data/src/k8s.io/kubernetes/contrib/completions/bash/k* /etc/bash_completion.d/
 
 echo "[INFO] Upgrading system..."
 sudo dnf upgrade -y
