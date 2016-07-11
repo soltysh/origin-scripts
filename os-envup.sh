@@ -21,7 +21,7 @@ echo "[INFO] Starting openshiftdev..."
 virsh start openshiftdev
 sleep 10
 
-while [ -z "$guest_ip" ]; do
+while [[ -z "$guest_ip" ]]; do
     guest_ip=$(arp -an | grep 52:54:00:f2:5e:34 | cut -f 2 -d "(" | cut -f 1 -d ")")
     sleep 1
 done
@@ -30,7 +30,7 @@ echo "[INFO] Checking if $guest_ip is up..."
 
 while true; do
     ssh -t -q vagrant@$guest_ip "echo 2>&1"
-    if [ $? -eq 0 ]; then
+    if [[ $? -eq 0 ]]; then
         break
     fi
     sleep 1
@@ -39,7 +39,7 @@ done
 script_path=$(mktemp)
 
 # sometimes I don't want to have the images to be pulled
-if [ "$1" == "--fast" ]; then
+if [[ "$1" == "--fast" ]]; then
 cat <<EOF > $script_path
 echo "[INFO] Mounting origin..."
 sudo mount 192.168.121.1:/nfsshare/origin /data/src/github.com/openshift/origin/

@@ -8,7 +8,7 @@ registry=$(sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/am
 set +e
 while true; do
     curl --max-time 2 -fs http://${registry}/healthz
-    if [ $? -eq 0 ]; then
+    if [[ $? -eq 0 ]]; then
         break
     fi
     sleep 1

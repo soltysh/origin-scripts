@@ -16,7 +16,7 @@ sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/openshi
 set +e
 while true; do
     curl --max-time 2 -kfs https://localhost:8443/healthz &>/dev/null
-    if [ $? -eq 0 ]; then
+    if [[ $? -eq 0 ]]; then
         break
     fi
     sleep 1
@@ -52,14 +52,14 @@ set +e
 while true; do
     oc get namespace/openshift \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig &>/dev/null
-    if [ $? -eq 0 ]; then
+    if [[ $? -eq 0 ]]; then
         break
     fi
     sleep 1
 done
 release="centos7"
 cat /etc/redhat-release | grep -q "Red Hat Enterprise Linux"
-if [ $? -eq 0 ]; then
+if [[ $? -eq 0 ]]; then
     release="rhel7"
 fi
 set -e
