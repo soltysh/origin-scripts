@@ -52,9 +52,6 @@ os-cleanup.sh
 
 echo "[INFO] Installing completions..."
 sudo cp /data/src/github.com/openshift/origin/contrib/completions/bash/o* /etc/bash_completion.d/
-
-echo "[INFO] Upgrading system..."
-sudo dnf upgrade -y
 EOF
 else
 cat <<EOF > $script_path
