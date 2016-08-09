@@ -6,6 +6,7 @@ echo "[INFO] Checking for running k8s..."
 curl --max-time 2 -fs http://127.0.0.1:8080/healthz
 if [[ ! $? -eq 0 ]]; then
     echo "[INFO] Starting k8s..."
+    export RUNTIME_CONFIG="batch/v2alpha1=true"
     screen -d -m /data/src/k8s.io/kubernetes/hack/local-up-cluster.sh -o _output/local/bin/linux/amd64/
 
     while true; do
@@ -17,11 +18,11 @@ if [[ ! $? -eq 0 ]]; then
     done
 
     /data/src/k8s.io/kubernetes/_output/local/bin/linux/amd64/kubectl \
-        config set-cluster local
-        --server=http://127.0.0.1:8080
+        config set-cluster local \
+        --server=http://127.0.0.1:8080 \
         --insecure-skip-tls-verify=true
     /data/src/k8s.io/kubernetes/_output/local/bin/linux/amd64/kubectl \
-        config set-context local
+        config set-context local \
         --cluster=local
     /data/src/k8s.io/kubernetes/_output/local/bin/linux/amd64/kubectl \
         config use-context local
@@ -32,4 +33,4 @@ fi
     ./_output/local/go/bin/e2e.test -- \
     --provider=local \
     --kubeconfig=/home/vagrant/.kube/config \
-    --host=http://127.0.0.1:8080 \
+    --host=http://127.0.0.1:8080
