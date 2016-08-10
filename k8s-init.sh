@@ -7,7 +7,7 @@ export RUNTIME_CONFIG="batch/v2alpha1=true"
 screen -d -m /data/src/k8s.io/kubernetes/hack/local-up-cluster.sh -o _output/local/bin/linux/amd64/
 
 while true; do
-    curl --max-time 2 -fs http://127.0.0.1:8080/healthz
+    curl --max-time 2 -fs http://127.0.0.1:8080/healthz &>/dev/null
     if [[ $? -eq 0 ]]; then
         break
     fi
