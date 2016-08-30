@@ -40,7 +40,7 @@ script_path=$(mktemp)
 
 # sometimes I don't want to have the images to be pulled
 if [[ "$1" == "--fast" ]]; then
-cat <<EOF > $script_path
+    cat <<EOF > $script_path
 echo "[INFO] Mounting origin..."
 sudo mount 192.168.121.1:/nfsshare/origin /data/src/github.com/openshift/origin/
 
@@ -54,7 +54,7 @@ echo "[INFO] Installing completions..."
 sudo cp /data/src/github.com/openshift/origin/contrib/completions/bash/o* /etc/bash_completion.d/
 EOF
 else
-cat <<EOF > $script_path
+    cat <<EOF > $script_path
 echo "[INFO] Mounting origin..."
 sudo mount 192.168.121.1:/nfsshare/origin /data/src/github.com/openshift/origin/
 
@@ -77,7 +77,8 @@ sudo dnf upgrade -y
 EOF
 fi
 
-scp $GOPATH/src/github.com/soltysh/origin-scripts/*.sh vagrant@$guest_ip:bin/
+shopt -s extglob
+scp $GOPATH/src/github.com/soltysh/origin-scripts/!(os-envup).sh vagrant@$guest_ip:bin/
 cat $script_path | ssh -t vagrant@$guest_ip
 rm -f ${script_path}
 
