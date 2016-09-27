@@ -34,13 +34,12 @@ oadm registry \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
 
 echo "[INFO] Creating router..."
-oadm policy add-scc-to-user hostnetwork \
-    --serviceaccount=router \
+oadm policy add-scc-to-user hostnetwork system:serviceaccount:default:router \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
 oadm router \
     --latest-images \
-    --config=$HOME/openshift.local.config/master/admin.kubeconfig \
-    --service-account=router
+    --service-account=router \
+    --config=$HOME/openshift.local.config/master/admin.kubeconfig
 
 echo "[INFO] Allowing access to etcd..."
 sudo chmod +r $HOME/openshift.local.config/master/master.etcd-client.key
