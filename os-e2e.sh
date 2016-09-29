@@ -17,6 +17,7 @@ if [[ ! $? -eq 0 ]]; then
 fi
 
 KUBECONFIG=/home/vagrant/openshift.local.config/master/admin.kubeconfig \
+    EXTENDED_TEST_PATH=/data/src/github.com/openshift/origin/test/extended \
     /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/ginkgo \
     -focus="$@" \
     /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/extended.test
