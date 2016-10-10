@@ -6,6 +6,7 @@ sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/openshi
     --write-config=$HOME/openshift.local.config \
     --etcd-dir=$HOME/openshift.local.etcd \
     --volume-dir=$HOME/openshift.local.volumes \
+    --images="openshift/origin-\${component}:${version}" \
     --latest-images &> /dev/null
 # replace subdomain configuration
 server_ip=$(ip addr | grep 'eth0' | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
@@ -33,6 +34,7 @@ sudo chmod a+rwX $HOME/openshift.local.config/master/admin.kubeconfig
 
 echo "[INFO] Creating registry..."
 oadm registry \
+    --images="openshift/origin-\${component}:${version}" \
     --latest-images \
     --namespace=default \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
@@ -41,6 +43,7 @@ echo "[INFO] Creating router..."
 oadm policy add-scc-to-user hostnetwork system:serviceaccount:default:router \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
 oadm router \
+    --images="openshift/origin-\${component}:${version}" \
     --latest-images \
     --service-account=router \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
