@@ -15,39 +15,61 @@ class Flake(Item):
 
 class JenkinsTestsSpider(XMLFeedSpider):
     name = 'jenkins_tests'
-    allowed_domains = ['redhat.com']
+    # we only crawl this particular domain
+    allowed_domains = ['ci.openshift.redhat.com']
+    # the namespace of the rssAll and rssFailed
     namespaces = [('x', 'http://www.w3.org/2005/Atom'),]
+    # only xml iterator works
     iterator = 'xml'
+    # which tags to process
     itertag = 'x:entry'
 
     def __init__(self, pattern='', url='', since=None, *args, **kwargs):
+        """
+        Initiate the spider saving arguments from user (-a name=value)
+        """
         super(JenkinsTestsSpider, self).__init__(*args, **kwargs)
         if len(pattern) == 0 or len(url) == 0:
             raise Exception('missing -a pattern or -a url argument')
         self.pattern = re.compile(pattern, re.I)
         self.start_urls = [url]
         if since:
+            # if parsing error occurs it'll throw an exception
             self.since = datetime.strptime(since, '%Y-%m-%dT%H:%M:%SZ')
 
     def parse_node(self, response, node):
+        """
+        Method responsible for parsing rssAll/rssFailed entries from jenkins.
+        """
         url = node.xpath('x:link/@href').extract_first()
         date = node.xpath('x:updated/text()').extract_first()
+        # filter dates, if since was specified
         if self.since and datetime.strptime(date, '%Y-%m-%dT%H:%M:%SZ') < self.since:
             return
+        # create a request object that will be further processed using parse_output
         request = Request(url=url + 'logText/progressiveText?start=0', callback=self.parse_output)
+        # save the original URL and date of a test run
         request.meta['url'] = url
         request.meta['date'] = date
+        # and trigger processing
         yield request
 
     def parse_output(self, response):
+        """
+        Method responsible for parsing the output from a test run.
+        """
         output = str(response.body)
         flake = Flake(pr=' - none - ')
+        # read PR number from output, since sometimes comment lacks that information
         pr_match = PR_RE.search(output)
         if pr_match:
             flake['pr'] = pr_match.group()
         flake['date'] = response.meta['date']
         flake['link'] = response.meta['url']
+        # search for the pattern in the output
         pattern_match = self.pattern.search(output)
         if pattern_match:
+            # save only those items that match the pattern, with 256 characters
+            # before and after the pattern
             flake['output'] = output[pattern_match.start()-256:pattern_match.end()+256]
             yield flake
