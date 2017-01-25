@@ -7,6 +7,9 @@ from scrapy.spiders import XMLFeedSpider
 PR_RE = re.compile(r'https://github.com/openshift/origin/pull/\d+', re.M)
 
 class Flake(Item):
+    """
+    Flake item class.
+    """
     date = Field()
     link = Field()
     pr = Field()
@@ -14,6 +17,9 @@ class Flake(Item):
 
 
 class JenkinsTestsSpider(XMLFeedSpider):
+    """
+    Main spider class, inheriting from XMLFeedSpider.
+    """
     name = 'jenkins_tests'
     # we only crawl this particular domain
     allowed_domains = ['ci.openshift.redhat.com']
@@ -24,7 +30,7 @@ class JenkinsTestsSpider(XMLFeedSpider):
     # which tags to process
     itertag = 'x:entry'
 
-    def __init__(self, pattern='', url='', since=None, *args, **kwargs):
+    def __init__(self, pattern='', url='', since=None, offset=256, *args, **kwargs):
         """
         Initiate the spider saving arguments from user (-a name=value)
         """
@@ -36,6 +42,7 @@ class JenkinsTestsSpider(XMLFeedSpider):
         if since:
             # if parsing error occurs it'll throw an exception
             self.since = datetime.strptime(since, '%Y-%m-%dT%H:%M:%SZ')
+        self.offset = offset
 
     def parse_node(self, response, node):
         """
@@ -47,7 +54,8 @@ class JenkinsTestsSpider(XMLFeedSpider):
         if self.since and datetime.strptime(date, '%Y-%m-%dT%H:%M:%SZ') < self.since:
             return
         # create a request object that will be further processed using parse_output
-        request = Request(url=url + 'logText/progressiveText?start=0', callback=self.parse_output)
+        request = Request(url=url + 'logText/progressiveText?start=0',
+            callback=self.parse_output)
         # save the original URL and date of a test run
         request.meta['url'] = url
         request.meta['date'] = date
@@ -67,9 +75,9 @@ class JenkinsTestsSpider(XMLFeedSpider):
         flake['date'] = response.meta['date']
         flake['link'] = response.meta['url']
         # search for the pattern in the output
-        pattern_match = self.pattern.search(output)
-        if pattern_match:
-            # save only those items that match the pattern, with 256 characters
+        match = self.pattern.search(output)
+        if match:
+            # save only those items that match the pattern, with offset characters
             # before and after the pattern
-            flake['output'] = output[pattern_match.start()-256:pattern_match.end()+256]
+            flake['output'] = output[match.start()-self.offset:match.end()+self.offset]
             yield flake
