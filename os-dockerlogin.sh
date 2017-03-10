@@ -15,5 +15,5 @@ while true; do
 done
 set -e
 token=$(oc whoami -t)
-docker login -u test-admin -e test@example.org -p ${token} ${registry}
+docker login -u test-admin -p ${token} ${registry}
 echo ${registry}
