@@ -6,8 +6,8 @@ sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/openshi
     --write-config=$HOME/openshift.local.config \
     --etcd-dir=$HOME/openshift.local.etcd \
     --volume-dir=$HOME/openshift.local.volumes \
-    --images="openshift/origin-\${component}:\${version}" \
-    --latest-images &> /dev/null
+    --latest-images \
+    --images="openshift/origin-\${component}:\${version}" &> /dev/null
 # replace subdomain configuration
 server_ip=$(ip addr | grep 'eth0' | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
 sudo sed "s/^  subdomain: router.default.svc.cluster.local$/  subdomain: ${server_ip}.nip.io/g" \
