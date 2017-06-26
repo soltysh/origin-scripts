@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 pushd /data/src/k8s.io/kubernetes > /dev/null
 
