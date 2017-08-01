@@ -7,7 +7,7 @@ export RUNTIME_CONFIG="batch/v2alpha1=true"
 screen -d -m sudo "RUNTIME_CONFIG=$RUNTIME_CONFIG" "PATH=$PATH" \
     /data/src/k8s.io/kubernetes/hack/local-up-cluster.sh \
     -o _output/local/bin/linux/amd64/
-
+set +e
 while true; do
     curl --max-time 2 -fs http://127.0.0.1:8080/healthz &>/dev/null
     if [[ $? -eq 0 ]]; then
@@ -15,6 +15,7 @@ while true; do
     fi
     sleep 1
 done
+set -e
 
 echo "[INFO] Initiating kubectl..."
 /data/src/k8s.io/kubernetes/_output/local/bin/linux/amd64/kubectl \
