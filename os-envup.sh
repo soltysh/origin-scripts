@@ -43,10 +43,10 @@ script_path=$(mktemp)
 if [[ "$1" == "--fast" ]]; then
     cat <<EOF > $script_path
 echo "[INFO] Mounting origin..."
-sudo mount 192.168.121.1:/home/maszulik/workspace/origin/src/github.com/openshift/origin /data/src/github.com/openshift/origin/
+sudo mount 192.168.121.1:/nfsshare/origin /data/src/github.com/openshift/origin/
 
 echo "[INFO] Mounting k8s..."
-sudo mount 192.168.121.1:/home/maszulik/workspace/k8s/src/k8s.io/kubernetes /data/src/k8s.io/kubernetes/
+sudo mount 192.168.121.1:/nfsshare/kubernetes /data/src/k8s.io/kubernetes/
 
 echo "[INFO] Cleaning environment..."
 os-cleanup.sh
@@ -57,14 +57,19 @@ EOF
 else
     cat <<EOF > $script_path
 echo "[INFO] Mounting origin..."
-sudo mount 192.168.121.1:/home/maszulik/workspace/origin/src/github.com/openshift/origin /data/src/github.com/openshift/origin/
+sudo mount 192.168.121.1:/nfsshare/origin /data/src/github.com/openshift/origin/
 
 echo "[INFO] Mounting k8s..."
-sudo mount 192.168.121.1:/home/maszulik/workspace/k8s/src/k8s.io/kubernetes /data/src/k8s.io/kubernetes/
+sudo mount 192.168.121.1:/nfsshare/kubernetes /data/src/k8s.io/kubernetes/
 
 echo "[INFO] Pulling images..."
 for img in $(echo $images); do
-    docker pull \$img
+    while true; do
+        docker pull \$img
+        if [[ $? -eq 0 ]]; then
+            break
+        fi
+    done
 done
 
 echo "[INFO] Cleaning environment..."

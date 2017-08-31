@@ -15,3 +15,4 @@ echo "[INFO] Pruning dirs..."
 sudo rm -rf $HOME/openshift.local.*
 sudo rm -rf $HOME/logs/*
 sudo rm -rf $HOME/.kube
+sudo rm -rf /var/run/kubernetes

@@ -3,8 +3,8 @@
 pushd /data/src/k8s.io/kubernetes > /dev/null
 
 echo "[INFO] Starting k8s..."
-export RUNTIME_CONFIG="batch/v2alpha1=true"
-screen -d -m sudo "RUNTIME_CONFIG=$RUNTIME_CONFIG" "PATH=$PATH" \
+export KUBELET_FLAGS="--fail-swap-on=false"
+screen -d -m sudo "KUBELET_FLAGS=$KUBELET_FLAGS" "PATH=$PATH" \
     /data/src/k8s.io/kubernetes/hack/local-up-cluster.sh \
     -o _output/local/bin/linux/amd64/
 set +e
@@ -17,13 +17,22 @@ while true; do
 done
 set -e
 
+sudo chmod +r /var/run/kubernetes/server-ca.crt
+sudo chmod +r /var/run/kubernetes/client-admin.crt
+sudo chmod +r /var/run/kubernetes/client-admin.key
+
 echo "[INFO] Initiating kubectl..."
 /data/src/k8s.io/kubernetes/_output/local/bin/linux/amd64/kubectl \
     config set-cluster local \
-    --server=http://127.0.0.1:8080 \
-    --insecure-skip-tls-verify=true
+    --server=https://localhost:6443 \
+    --certificate-authority=/var/run/kubernetes/server-ca.crt
+/data/src/k8s.io/kubernetes/_output/local/bin/linux/amd64/kubectl \
+    config set-credentials myself \
+    --client-key=/var/run/kubernetes/client-admin.key \
+    --client-certificate=/var/run/kubernetes/client-admin.crt
 /data/src/k8s.io/kubernetes/_output/local/bin/linux/amd64/kubectl \
     config set-context local \
-    --cluster=local
+    --cluster=local \
+    --user=myself
 /data/src/k8s.io/kubernetes/_output/local/bin/linux/amd64/kubectl \
     config use-context local
