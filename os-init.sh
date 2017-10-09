@@ -14,6 +14,7 @@ sudo sed "s/^  subdomain: router.default.svc.cluster.local$/  subdomain: ${serve
     -i $HOME/openshift.local.config/master/master-config.yaml
 # start openshift
 loglevel=${1:-0}
+mkdir -p $HOME/logs
 sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/openshift start \
   --master-config=$HOME/openshift.local.config/master/master-config.yaml \
   --node-config=$HOME/openshift.local.config/node-"$(hostname)"/node-config.yaml \
