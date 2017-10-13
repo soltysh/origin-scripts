@@ -1,7 +1,9 @@
-#!/bin/bash -e
+#!/bin/bash
 
 echo "[INFO] Killing OpenShift..."
 sudo pkill openshift
+
+set -e
 
 echo "[INFO] Starting OpenShift..."
 loglevel=${1:-0}
