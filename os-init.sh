@@ -9,7 +9,7 @@ sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/openshi
     --latest-images \
     --images="openshift/origin-\${component}:\${version}" &> /dev/null
 # replace subdomain configuration
-server_ip=$(ip addr | grep 'eth0' | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
+server_ip=$(ip -o -4 addr show up primary scope global dynamic | awk '{print $4}' | cut -f1  -d'/')
 sudo sed "s/^  subdomain: router.default.svc.cluster.local$/  subdomain: ${server_ip}.nip.io/g" \
     -i $HOME/openshift.local.config/master/master-config.yaml
 # start openshift
