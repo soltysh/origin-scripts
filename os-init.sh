@@ -54,7 +54,6 @@ sudo chmod +r $HOME/openshift.local.config/master/master.etcd-client.key
 sudo chmod +r $HOME/openshift.local.config/master/master.etcd-client.crt
 sudo chmod +r $HOME/openshift.local.config/master/ca.crt
 
-echo "[INFO] Importing ImageStreams..."
 set +e
 while true; do
     oc get namespace/openshift \
@@ -70,13 +69,24 @@ if [[ $? -eq 0 ]]; then
     release="rhel7"
 fi
 set -e
+
+echo "[INFO] Creating prometheus..."
+oc new-app \
+    -f /data/src/github.com/openshift/origin/examples/prometheus/prometheus.yaml \
+    --config=$HOME/openshift.local.config/master/admin.kubeconfig
+
+echo "[INFO] Importing ImageStreams..."
 oc create \
     -f /data/src/github.com/openshift/origin/examples/image-streams/image-streams-"${release}".json \
-    -n openshift  \
+    --namespace=openshift  \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
 
 echo "[INFO] Setting up policy..."
 oadm policy add-role-to-user view test-admin \
+    --namespace=kube-system \
+    --config=$HOME/openshift.local.config/master/admin.kubeconfig
+oadm policy add-role-to-user view test-admin \
+    --namespace=default \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
 
 echo "[INFO] Logging in to OpenShift..."
