@@ -10,15 +10,26 @@ sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/openshi
     --images="openshift/origin-\${component}:\${version}" &> /dev/null
 # replace subdomain configuration
 server_ip=$(ip -o -4 addr show up primary scope global dynamic | awk '{print $4}' | cut -f1  -d'/')
-sudo sed "s/^  subdomain: router.default.svc.cluster.local$/  subdomain: ${server_ip}.nip.io/g" \
-    -i $HOME/openshift.local.config/master/master-config.yaml
+sudo cp $HOME/openshift.local.config/master/master-config.yaml \
+    $HOME/openshift.local.config/master/master-config.yaml.bak
+sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/openshift ex config patch \
+    $HOME/openshift.local.config/master/master-config.yaml.bak \
+    --patch='{"routingConfig":{"subdomain":"'"${server_ip}"'.nip.io"}}' \
+    | sudo tee $HOME/openshift.local.config/master/master-config.yaml >/dev/null
+# allow working with swap
+sudo cp $HOME/openshift.local.config/node-"$(hostname)"/node-config.yaml \
+    $HOME/openshift.local.config/node-"$(hostname)"/node-config.yaml.bak
+sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/openshift ex config patch \
+    $HOME/openshift.local.config/node-"$(hostname)"/node-config.yaml.bak \
+    --patch='{"kubeletArguments":{"fail-swap-on":["false"]}}' \
+    | sudo tee $HOME/openshift.local.config/node-"$(hostname)"/node-config.yaml >/dev/null
 # start openshift
 loglevel=${1:-0}
 mkdir -p $HOME/logs
 sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/openshift start \
-  --master-config=$HOME/openshift.local.config/master/master-config.yaml \
-  --node-config=$HOME/openshift.local.config/node-"$(hostname)"/node-config.yaml \
-  --loglevel=$loglevel &> $HOME/logs/openshift.log &
+    --master-config=$HOME/openshift.local.config/master/master-config.yaml \
+    --node-config=$HOME/openshift.local.config/node-"$(hostname)"/node-config.yaml \
+    --loglevel=$loglevel &> $HOME/logs/openshift.log &
 set +e
 while true; do
     curl --max-time 2 -kfs https://localhost:8443/healthz &>/dev/null
