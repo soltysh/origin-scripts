@@ -45,16 +45,16 @@ export CURL_CA_BUNDLE=$HOME/openshift.local.config/master/ca.crt
 sudo chmod a+rwX $HOME/openshift.local.config/master/admin.kubeconfig
 
 echo "[INFO] Creating registry..."
-oadm registry \
+oc adm registry \
     --images="openshift/origin-\${component}:\${version}" \
     --latest-images \
     --namespace=default \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
 
 echo "[INFO] Creating router..."
-oadm policy add-scc-to-user hostnetwork system:serviceaccount:default:router \
+oc adm policy add-scc-to-user hostnetwork system:serviceaccount:default:router \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
-oadm router \
+oc adm router \
     --images="openshift/origin-\${component}:\${version}" \
     --latest-images \
     --service-account=router \
@@ -93,10 +93,10 @@ oc create \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
 
 echo "[INFO] Setting up policy..."
-oadm policy add-role-to-user view test-admin \
+oc adm policy add-role-to-user view test-admin \
     --namespace=kube-system \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
-oadm policy add-role-to-user view test-admin \
+oc adm policy add-role-to-user view test-admin \
     --namespace=default \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
 
