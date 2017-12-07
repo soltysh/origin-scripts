@@ -1,18 +1,14 @@
 #!/bin/bash
 
-images="docker.io/openshift/origin-sti-builder \
-    docker.io/openshift/origin-custom-docker-builder \
-    docker.io/openshift/origin-docker-builder \
-    docker.io/openshift/origin-docker-registry \
-    docker.io/openshift/origin-deployer \
-    docker.io/openshift/hello-openshift \
-    docker.io/openshift/origin-haproxy-router \
-    docker.io/openshift/origin \
-    docker.io/openshift/origin-pod \
-    docker.io/openshift/origin-release \
-    docker.io/openshift/origin-haproxy-router-base \
+images="docker.io/openshift/origin \
     docker.io/openshift/origin-base \
-    docker.io/centos:centos7"
+    docker.io/openshift/origin-pod \
+    docker.io/openshift/origin-deployer \
+    docker.io/openshift/origin-docker-builder \
+    docker.io/openshift/origin-sti-builder \
+    docker.io/openshift/origin-haproxy-router \
+    docker.io/openshift/origin-docker-registry \
+    docker.io/openshift/hello-openshift"
 
 echo "[INFO] Starting NFS..."
 sudo systemctl start nfs-server.service
