@@ -1,5 +1,34 @@
 #!/bin/bash -e
 
+function patchcmd {
+    local version="$(openshift version | grep '^openshift v' | awk -F 'v' '{print $2}')"
+    local semver=(${version//./ })
+    local major="${semver[0]}"
+    local minor="${semver[1]}"
+
+    if [[ "$major" -le "3" ]] && [[ "$minor" -lt "8" ]]; then
+	echo "openshift"
+    else
+	echo "oc"
+    fi
+}
+
+function patchconfig {
+    local file=$1
+    local patch_content=$2
+    local patch_type=${3:-strategic}
+    local tmpfile=$(mktemp)
+
+    sudo cp $file $tmpfile
+
+    sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/$(patchcmd) ex config patch \
+	 --type=${patch_type} \
+	 $tmpfile \
+	 --patch=${patch_content} | sudo tee $file >/dev/null
+
+    sudo rm $tmpfile
+}
+
 echo "[INFO] Starting OpenShift..."
 # write config
 sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/openshift start \
@@ -10,19 +39,8 @@ sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/openshi
     --images="openshift/origin-\${component}:\${version}" &> /dev/null
 # replace subdomain configuration
 server_ip=$(ip -o -4 addr show up primary scope global dynamic | awk '{print $4}' | cut -f1  -d'/')
-sudo cp $HOME/openshift.local.config/master/master-config.yaml \
-    $HOME/openshift.local.config/master/master-config.yaml.bak
-sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/oc ex config patch \
-    $HOME/openshift.local.config/master/master-config.yaml.bak \
-    --patch='{"routingConfig":{"subdomain":"'"${server_ip}"'.nip.io"}}' \
-    | sudo tee $HOME/openshift.local.config/master/master-config.yaml >/dev/null
-# turn off image gc
-sudo cp $HOME/openshift.local.config/node-"$(hostname)"/node-config.yaml \
-    $HOME/openshift.local.config/node-"$(hostname)"/node-config.yaml.bak
-sudo /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/oc ex config patch \
-    $HOME/openshift.local.config/node-"$(hostname)"/node-config.yaml.bak \
-    --patch='{"kubeletArguments":{"image-gc-high-threshold":["99"]}}' \
-    | sudo tee $HOME/openshift.local.config/node-"$(hostname)"/node-config.yaml >/dev/null
+patchconfig $HOME/openshift.local.config/master/master-config.yaml '{"routingConfig":{"subdomain":"'"${server_ip}"'.nip.io"}}'
+patchconfig $HOME/openshift.local.config/node-"$(hostname)"/node-config.yaml '{"kubeletArguments":{"image-gc-high-threshold":["99"]}}'
 # start openshift
 loglevel=${1:-0}
 mkdir -p $HOME/logs
