@@ -8,6 +8,7 @@ images="docker.io/openshift/origin \
     docker.io/openshift/origin-sti-builder \
     docker.io/openshift/origin-haproxy-router \
     docker.io/openshift/origin-docker-registry \
+    docker.io/openshift/origin-web-console \
     docker.io/openshift/hello-openshift"
 
 echo "[INFO] Starting NFS..."

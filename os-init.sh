@@ -104,6 +104,22 @@ oc new-app \
     -f /data/src/github.com/openshift/origin/examples/prometheus/prometheus.yaml \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
 
+echo "[INFO] Setting up webconsole..."
+oc create namespace openshift-web-console \
+    --config=$HOME/openshift.local.config/master/admin.kubeconfig
+oc process \
+    -f /data/src/github.com/openshift/origin/install/origin-web-console/rbac-template.yaml \
+    --config=$HOME/openshift.local.config/master/admin.kubeconfig \
+    | oc auth reconcile -f - \
+    --config=$HOME/openshift.local.config/master/admin.kubeconfig
+console_config=$(mktemp)
+sed "s/127.0.0.1/${server_ip}/g" /data/src/github.com/openshift/origin/install/origin-web-console/console-config.yaml > ${console_config}
+oc process -f /data/src/github.com/openshift/origin/install/origin-web-console/console-template.yaml \
+    -p "API_SERVER_CONFIG=$(cat ${console_config})" \
+    --config=$HOME/openshift.local.config/master/admin.kubeconfig \
+    | oc apply -n openshift-web-console -f - \
+    --config=$HOME/openshift.local.config/master/admin.kubeconfig
+
 echo "[INFO] Importing ImageStreams..."
 oc create \
     -f /data/src/github.com/openshift/origin/examples/image-streams/image-streams-"${release}".json \
