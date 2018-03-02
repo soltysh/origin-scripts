@@ -107,11 +107,6 @@ oc new-app \
 echo "[INFO] Setting up webconsole..."
 oc create namespace openshift-web-console \
     --config=$HOME/openshift.local.config/master/admin.kubeconfig
-oc process \
-    -f /data/src/github.com/openshift/origin/install/origin-web-console/rbac-template.yaml \
-    --config=$HOME/openshift.local.config/master/admin.kubeconfig \
-    | oc auth reconcile -f - \
-    --config=$HOME/openshift.local.config/master/admin.kubeconfig
 console_config=$(mktemp)
 sed "s/127.0.0.1/${server_ip}/g" /data/src/github.com/openshift/origin/install/origin-web-console/console-config.yaml > ${console_config}
 oc process -f /data/src/github.com/openshift/origin/install/origin-web-console/console-template.yaml \
