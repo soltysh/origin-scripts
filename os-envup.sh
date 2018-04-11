@@ -1,7 +1,6 @@
 #!/bin/bash
 
 images="docker.io/openshift/origin \
-    docker.io/openshift/origin-base \
     docker.io/openshift/origin-pod \
     docker.io/openshift/origin-deployer \
     docker.io/openshift/origin-docker-builder \
