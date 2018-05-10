@@ -1,15 +1,17 @@
 #!/bin/bash
 
-images="docker.io/openshift/origin-control-plane \
+images="docker.io/openshift/hello-openshift \
     docker.io/openshift/origin-cli \
-    docker.io/openshift/origin-pod \
-    docker.io/openshift/origin-node \
+    docker.io/openshift/origin-control-plane \
     docker.io/openshift/origin-deployer \
     docker.io/openshift/origin-docker-builder \
-    docker.io/openshift/origin-haproxy-router \
     docker.io/openshift/origin-docker-registry \
-    docker.io/openshift/origin-web-console \
-    docker.io/openshift/hello-openshift"
+    docker.io/openshift/origin-haproxy-router \
+    docker.io/openshift/origin-hyperkube \
+    docker.io/openshift/origin-hypershift \
+    docker.io/openshift/origin-node \
+    docker.io/openshift/origin-pod \
+    docker.io/openshift/origin-web-console"
 
 echo "[INFO] Starting NFS..."
 sudo systemctl start nfs-server.service
