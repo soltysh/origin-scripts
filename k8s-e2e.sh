@@ -12,5 +12,6 @@ fi
     -focus="$@" \
     ./_output/local/go/bin/e2e.test -- \
     --provider=local \
+    --minStartupPods=0 \
     --kubeconfig=$HOME/.kube/config \
     --host=http://127.0.0.1:8080
