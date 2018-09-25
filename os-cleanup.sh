@@ -16,4 +16,5 @@ sudo rm -rf $HOME/openshift.local.*
 sudo rm -rf $HOME/logs/*
 sudo rm -rf $HOME/.kube
 sudo rm -rf /var/run/kubernetes
+sudo rm -rf /var/lib/origin
 sudo rm -rf /tmp/openshift*
