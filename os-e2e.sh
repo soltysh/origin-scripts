@@ -16,7 +16,7 @@ if [[ ! $? -eq 0 ]]; then
     done
 fi
 
-KUBECONFIG=$HOME/openshift.local.config/master/admin.kubeconfig \
+KUBECONFIG=$HOME/openshift.local.clusterup/kube-apiserver/admin.kubeconfig \
     EXTENDED_TEST_PATH=/data/src/github.com/openshift/origin/test/extended \
     /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/ginkgo \
     -focus="$@" \
