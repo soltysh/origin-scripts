@@ -88,4 +88,4 @@ export GOPATH=/data
 
 # bash variables
 export EDITOR=vim
-export PATH=$HOME/bin:$PATH
+export PATH=/data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/:/data/src/k8s.io/kubernetes/_output/local/bin/linux/amd64/:$HOME/bin:$PATH
