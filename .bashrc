@@ -82,6 +82,7 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 alias myip='ip -br -c a'
+alias kc='kubectl'
 
 # go settings
 export GOPATH=/data
