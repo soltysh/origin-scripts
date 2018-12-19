@@ -85,7 +85,17 @@ alias myip='ip -br -c a'
 alias kc='kubectl'
 
 # go settings
-export GOPATH=/data
+[[ -s "$HOME/.gvm/scripts/gvm" ]] && source "$HOME/.gvm/scripts/gvm"
+goorigin() {
+    gvm use go1.10.7
+    export GOPATH=/data
+    cd $GOPATH/src/github.com/openshift/origin
+}
+gok8s() {
+    gvm use go1.11.4
+    export GOPATH=/data
+    cd $GOPATH/src/k8s.io/kubernetes
+}
 
 # bash variables
 export EDITOR=vim
