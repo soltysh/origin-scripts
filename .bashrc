@@ -84,6 +84,11 @@ alias l='ls -CF'
 alias myip='ip -br -c a'
 alias kc='kubectl'
 
+# setup kc alias completion
+# https://github.com/cykerway/complete-alias
+source ~/.bash_completion.d/complete_alias
+complete -F _complete_alias kc
+
 # go settings
 [[ -s "$HOME/.gvm/scripts/gvm" ]] && source "$HOME/.gvm/scripts/gvm"
 goorigin() {
