@@ -1,18 +1,5 @@
 #!/bin/bash
 
-images="docker.io/openshift/hello-openshift \
-    docker.io/openshift/origin-cli \
-    docker.io/openshift/origin-control-plane \
-    docker.io/openshift/origin-deployer \
-    docker.io/openshift/origin-docker-builder \
-    docker.io/openshift/origin-docker-registry \
-    docker.io/openshift/origin-haproxy-router \
-    docker.io/openshift/origin-hyperkube \
-    docker.io/openshift/origin-hypershift \
-    docker.io/openshift/origin-node \
-    docker.io/openshift/origin-pod \
-    docker.io/openshift/origin-web-console"
-
 echo "[INFO] Starting NFS..."
 sudo systemctl start nfs-server.service
 
@@ -41,21 +28,6 @@ sudo mount 192.168.122.1:/nfsshare/origin /data/src/github.com/openshift/origin/
 echo "[INFO] Mounting k8s..."
 sudo mount 192.168.122.1:/nfsshare/kubernetes /data/src/k8s.io/kubernetes/
 EOF
-
-# sometimes I don't want to have the images to be pulled
-if [ $# -eq 0 ]; then
-    cat <<EOF >> $script_path
-echo "[INFO] Pulling images..."
-for img in $(echo $images); do
-    while true; do
-        docker pull \$img
-        if [[ $? -eq 0 ]]; then
-            break
-        fi
-    done
-done
-EOF
-fi
 
 cat <<EOF >> $script_path
 echo "[INFO] Cleaning environment..."
