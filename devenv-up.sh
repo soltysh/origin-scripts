@@ -45,7 +45,7 @@ EOF
 fi
 
 shopt -s extglob
-scp $GOPATH/src/github.com/soltysh/origin-scripts/!(os-envup).sh x@$guest_ip:bin/
+scp $GOPATH/src/github.com/soltysh/origin-scripts/!(devenv-up).sh x@$guest_ip:bin/
 cat $script_path | ssh -t x@$guest_ip
 rm -f ${script_path}
 
