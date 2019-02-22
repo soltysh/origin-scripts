@@ -7,7 +7,7 @@ screen -d -m \
     /data/src/github.com/openshift/origin/hack/local-up-master/master.sh
 set +e
 while true; do
-    curl --max-time 2 -fs http://127.0.0.1:8443/healthz &>/dev/null
+    curl --max-time 2 -kfs https://127.0.0.1:8443/healthz &>/dev/null
     if [[ $? -eq 0 ]]; then
         break
     fi
@@ -15,4 +15,11 @@ while true; do
 done
 set -e
 
-echo "export KUBECONFIG=/data/src/github.com/openshift/origin/openshift.local.masterup/admin.kubeconfig"
+mkdir -p $HOME/.kube/
+while true; do
+    if [ -f /data/src/github.com/openshift/origin/openshift.local.masterup/admin.kubeconfig ]; then
+        cp /data/src/github.com/openshift/origin/openshift.local.masterup/admin.kubeconfig $HOME/.kube/config
+        break
+    fi
+    sleep 1
+done
