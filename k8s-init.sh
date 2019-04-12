@@ -3,9 +3,10 @@
 pushd /data/src/k8s.io/kubernetes > /dev/null
 
 echo "[INFO] Starting k8s..."
-export KUBELET_FLAGS="--fail-swap-on=false --image-gc-high-threshold=99"
-screen -d -m sudo "KUBELET_FLAGS=$KUBELET_FLAGS" "PATH=$PATH" \
-    /data/src/k8s.io/kubernetes/hack/local-up-cluster.sh \
+screen -d -m sudo "KUBELET_FLAGS=--fail-swap-on=false --image-gc-high-threshold=99" \
+    "CONTAINER_RUNTIME=remote" "CONTAINER_RUNTIME_ENDPOINT=unix:///var/run/crio/crio.sock" \
+    "IMAGE_SERVICE_ENDPOINT=unix:///var/run/crio/crio.sock" "CGROUP_DRIVER=systemd" \
+    "PATH=$PATH" /data/src/k8s.io/kubernetes/hack/local-up-cluster.sh \
     -o _output/local/bin/linux/amd64/
 set +e
 while true; do
