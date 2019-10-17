@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "[INFO] Starting libvirtd..."
+sudo systemctl start libvirtd.service
+
 echo "[INFO] Starting NFS..."
 sudo systemctl start nfs-server.service
 
